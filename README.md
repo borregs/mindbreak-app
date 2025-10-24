@@ -12,9 +12,8 @@ Objetivos especificos:
 
 # Requerimientos de proyecto
 
-## Requerimientos del juego de rompecabezas (versión un jugador)
-
-## Requerimientos Funcionales (RF)
+Requerimientos del juego de rompecabezas (versión un jugador)
+Requerimientos Funcionales (RF)
 
 1. **Carga de imágenes**
     - 1.1: El sistema permitirá que el usuario seleccione una imagen desde su dispositivo.
