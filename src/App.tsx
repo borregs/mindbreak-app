@@ -3,8 +3,9 @@ import { Upload, Download, Trash2, ImageIcon, Puzzle } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Progress } from './components/ui/progress';
-import { removeBackground } from '@imgly/background-removal';
 import { PuzzlePage } from './components/PuzzlePage';
+import '@tensorflow/tfjs';
+import * as bodyPics from '@tensorflow-models/body-pix'
 
 type Page = 'home' | 'puzzle';
 
@@ -64,10 +65,7 @@ export default function App() {
       }, 200);
 
       // Remove background with single-thread configuration
-      const blob = await removeBackground(imageUrl, {
-        publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
-        device: 'cpu',
-      });
+      const blob = await removeBackground(imageUrl);
       clearInterval(progressInterval);
       setProgress(100);
 
@@ -81,6 +79,112 @@ export default function App() {
       setIsProcessing(false);
     }
   };
+
+  const removeBackground = async (imageUrl: string): Promise<Blob> => {
+    return new Promise<Blob>(async (resolve, reject) => {
+      try {
+        // Update progress: starting
+        setProgress(20);
+
+        // Load image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = imageUrl;
+        await new Promise<void>((res, rej) => {
+          img.onload = () => res();
+          img.onerror = (e) => rej(new Error('Error loading image'));
+        });
+        setProgress(30);
+
+        // Load BodyPix model (mobile config for speed)
+        const net = await bodyPics.load({
+          architecture: 'MobileNetV1',
+          outputStride: 16,
+          multiplier: 0.75,
+          quantBytes: 2,
+        } as any);
+        setProgress(50);
+
+        // Run person segmentation
+        const segmentation = await net.segmentPerson(img, {
+          internalResolution: 'medium',
+          segmentationThreshold: 0.7,
+          maxDetections: 1,
+        } as any);
+        setProgress(70);
+
+        // Draw image to canvas and apply alpha mask from segmentation
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width;
+        canvas.height = img.naturalHeight || img.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('No canvas context');
+
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const pixelData = imageData.data;
+
+        // segmentation.data is a Uint8Array with 1 for person, 0 for background
+        const mask = segmentation.data;
+        // Safety: ensure mask length matches pixel count
+        const pixelCount = canvas.width * canvas.height;
+        if (mask.length !== pixelCount) {
+          // If sizes mismatch, try to resize mask via canvas (fallback to drawMask)
+          // Use bodyPix.toMask + drawMask as fallback
+          const maskImage = bodyPics.toMask(segmentation);
+          // drawMask will overlay the foreground; instead we'll use drawMask onto a separate canvas
+          const outCanvas = document.createElement('canvas');
+          outCanvas.width = canvas.width;
+          outCanvas.height = canvas.height;
+          const outCtx = outCanvas.getContext('2d');
+          if (!outCtx) throw new Error('No canvas context');
+          // draw original
+          outCtx.drawImage(img, 0, 0, outCanvas.width, outCanvas.height);
+          // draw mask and use it to clear background
+          // Create an ImageData from maskImage and apply alpha
+          const maskCanvas = document.createElement('canvas');
+          maskCanvas.width = maskImage.width;
+          maskCanvas.height = maskImage.height;
+          const maskCtx = maskCanvas.getContext('2d');
+          if (!maskCtx) throw new Error('No canvas context');
+          maskCtx.putImageData(maskImage, 0, 0);
+          // Draw scaled mask onto outCtx and use globalCompositeOperation to keep only person
+          outCtx.globalCompositeOperation = 'destination-in';
+          outCtx.drawImage(maskCanvas, 0, 0, outCanvas.width, outCanvas.height);
+          outCtx.globalCompositeOperation = 'source-over';
+
+          setProgress(90);
+          outCanvas.toBlob((b) => {
+            if (b) resolve(b);
+            else reject(new Error('toBlob failed'));
+          }, 'image/png');
+          return;
+        }
+
+        // Apply mask directly to pixel alpha channel
+        for (let i = 0; i < pixelCount; i++) {
+          const alphaIndex = i * 4 + 3;
+          if (mask[i] === 0) {
+            // background -> make transparent
+            pixelData[alphaIndex] = 0;
+          } else {
+            // keep original alpha (opaque)
+            pixelData[alphaIndex] = 255;
+          }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+        setProgress(90);
+
+        canvas.toBlob((b) => {
+          if (b) resolve(b);
+          else reject(new Error('toBlob failed'));
+        }, 'image/png');
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 
   const handleDownload = () => {
     if (!processedImage) return;
