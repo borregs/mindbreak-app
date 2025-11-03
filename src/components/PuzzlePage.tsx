@@ -4,13 +4,17 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import PuzzlePieceComponent from './PuzzlePiece';
 
 interface PuzzlePiece {
   id: number;
-  currentPosition: number;
-  correctPosition: number;
+  x: number; // posición actual en px
+  y: number;
+  targetX: number; // posición objetivo en px
+  targetY: number;
   imageX: number;
   imageY: number;
+  tabs: { top: number; right: number; bottom: number; left: number };
 }
 
 interface PuzzlePageProps {
@@ -22,10 +26,13 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   const [gridSize, setGridSize] = useState<number>(3);
   const [puzzlePieces, setPuzzlePieces] = useState<PuzzlePiece[]>([]);
   const [selectedPiece, setSelectedPiece] = useState<number | null>(null);
+  const [draggingId, setDraggingId] = useState<number | null>(null);
+  const [zIndexCounter, setZIndexCounter] = useState(1);
   const [isSolved, setIsSolved] = useState(false);
   const [moves, setMoves] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const puzzleAreaRef = useRef<HTMLDivElement | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -44,16 +51,34 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   const initializePuzzle = () => {
     const totalPieces = gridSize * gridSize;
     const pieces: PuzzlePiece[] = [];
+    const pieceSize = 400 / gridSize;
+
+    // Generate complementary tabs for internal edges so adjacent pieces will fit.
+    // horizontalTabs[r][c] is the tab between (r,c) and (r,c+1) (value: 1 or -1)
+    const horizontalTabs: number[][] = Array.from({ length: gridSize }, () => Array.from({ length: Math.max(0, gridSize - 1) }, () => (Math.random() > 0.5 ? 1 : -1)));
+    // verticalTabs[r][c] is the tab between (r,c) and (r+1,c)
+    const verticalTabs: number[][] = Array.from({ length: Math.max(0, gridSize - 1) }, () => Array.from({ length: gridSize }, () => (Math.random() > 0.5 ? 1 : -1)));
 
     for (let i = 0; i < totalPieces; i++) {
       const row = Math.floor(i / gridSize);
       const col = i % gridSize;
+      const targetX = col * pieceSize;
+      const targetY = row * pieceSize;
+
+      const right = col === gridSize - 1 ? 0 : horizontalTabs[row][col];
+      const left = col === 0 ? 0 : -horizontalTabs[row][col - 1];
+      const bottom = row === gridSize - 1 ? 0 : verticalTabs[row][col];
+      const top = row === 0 ? 0 : -verticalTabs[row - 1][col];
+
       pieces.push({
         id: i,
-        currentPosition: i,
-        correctPosition: i,
+        x: targetX,
+        y: targetY,
+        targetX,
+        targetY,
         imageX: col,
         imageY: row,
+        tabs: { top, right, bottom, left },
       });
     }
 
@@ -63,14 +88,16 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   };
 
   const shufflePuzzle = () => {
-    const shuffled = [...puzzlePieces];
-    
-    // Fisher-Yates shuffle
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      shuffled[i].currentPosition = i;
-      shuffled[j].currentPosition = j;
+    const areaSize = 400;
+    const pieceSize = areaSize / gridSize;
+    const padding = 8;
+
+    const shuffled = puzzlePieces.map(p => ({ ...p }));
+
+    // Scatter pieces randomly inside the puzzle area
+    for (let p of shuffled) {
+      p.x = Math.random() * (areaSize - pieceSize - padding * 2) + padding;
+      p.y = Math.random() * (areaSize - pieceSize - padding * 2) + padding;
     }
 
     setPuzzlePieces(shuffled);
@@ -78,37 +105,68 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
     setMoves(0);
   };
 
-  const handlePieceClick = (position: number) => {
+  // Keep old click selection minimal (not primary for free movement)
+  const handlePieceClick = (positionIndex: number) => {
     if (isSolved) return;
+    if (selectedPiece === positionIndex) setSelectedPiece(null);
+    else setSelectedPiece(positionIndex);
+  };
 
-    if (selectedPiece === null) {
-      setSelectedPiece(position);
-    } else {
-      if (selectedPiece === position) {
-        setSelectedPiece(null);
-        return;
-      }
+  // Drag handlers (called from child PuzzlePiece)
+  const dragStateRef = useRef<{ id: number | null; offsetX: number; offsetY: number } | null>(null);
 
-      // Swap pieces
-      const newPieces = [...puzzlePieces];
-      const piece1Index = newPieces.findIndex(p => p.currentPosition === selectedPiece);
-      const piece2Index = newPieces.findIndex(p => p.currentPosition === position);
+  const handleDragStart = (id: number, pointerX: number, pointerY: number, offsetX: number, offsetY: number) => {
+    setDraggingId(id);
+    setZIndexCounter(z => z + 1);
+    dragStateRef.current = { id, offsetX, offsetY };
+  };
 
-      if (piece1Index !== -1 && piece2Index !== -1) {
-        newPieces[piece1Index].currentPosition = position;
-        newPieces[piece2Index].currentPosition = selectedPiece;
+  const handleDragMove = (id: number, pointerX: number, pointerY: number) => {
+    const state = dragStateRef.current;
+    if (!state || state.id !== id) return;
+    const area = puzzleAreaRef.current?.getBoundingClientRect();
+    if (!area) return;
+    const pieceSize = 400 / gridSize;
+    const newX = pointerX - area.left - state.offsetX;
+    const newY = pointerY - area.top - state.offsetY;
 
-        setPuzzlePieces(newPieces);
-        setMoves(moves + 1);
-        setSelectedPiece(null);
+    setPuzzlePieces(prev => prev.map(p => p.id === id ? { ...p, x: Math.max(0, Math.min(newX, 400 - pieceSize)), y: Math.max(0, Math.min(newY, 400 - pieceSize)) } : p));
+  };
 
-        // Check if solved
-        const solved = newPieces.every(piece => piece.currentPosition === piece.correctPosition);
-        if (solved) {
-          setIsSolved(true);
+  const handleDragEnd = (id: number, pointerX: number, pointerY: number) => {
+    const state = dragStateRef.current;
+    dragStateRef.current = null;
+    setDraggingId(null);
+
+    const area = puzzleAreaRef.current?.getBoundingClientRect();
+    if (!area) return;
+    const pieceSize = 400 / gridSize;
+    const releasedX = pointerX - area.left - (state?.offsetX ?? 0);
+    const releasedY = pointerY - area.top - (state?.offsetY ?? 0);
+
+    // Snap if within tolerance
+    const tolerance = Math.max(12, pieceSize * 0.12);
+
+    setPuzzlePieces(prev => {
+      const next = prev.map(p => {
+        if (p.id !== id) return p;
+        const dx = p.targetX - releasedX;
+        const dy = p.targetY - releasedY;
+        const dist = Math.hypot(dx, dy);
+        if (dist <= tolerance) {
+          return { ...p, x: p.targetX, y: p.targetY };
         }
-      }
-    }
+        return { ...p, x: Math.max(0, Math.min(releasedX, 400 - pieceSize)), y: Math.max(0, Math.min(releasedY, 400 - pieceSize)) };
+      });
+
+      // After drop, check solved
+      const allSnapped = next.every(p => Math.hypot(p.x - p.targetX, p.y - p.targetY) <= Math.max(8, pieceSize * 0.08));
+      if (allSnapped) setIsSolved(true);
+
+      return next;
+    });
+
+    setMoves(m => m + 1);
   };
 
   useEffect(() => {
@@ -118,42 +176,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   }, [uploadedImage, gridSize]);
 
   const getPieceAtPosition = (position: number) => {
-    return puzzlePieces.find(p => p.currentPosition === position);
-  };
-
-  const renderPuzzlePiece = (position: number) => {
-    const piece = getPieceAtPosition(position);
-    if (!piece || !uploadedImage) return null;
-
-    const pieceSize = 400 / gridSize;
-    const isSelected = selectedPiece === position;
-
-    return (
-      <div
-        key={position}
-        onClick={() => handlePieceClick(position)}
-        className={`relative cursor-pointer transition-all ${
-          isSelected ? 'ring-4 ring-primary scale-95' : 'hover:ring-2 hover:ring-primary/50'
-        }`}
-        style={{
-          width: `${pieceSize}px`,
-          height: `${pieceSize}px`,
-          overflow: 'hidden',
-        }}
-      >
-        <img
-          src={uploadedImage}
-          alt={`Pieza ${position}`}
-          className="absolute pointer-events-none"
-          style={{
-            width: `${400}px`,
-            height: `${400}px`,
-            left: `-${piece.imageX * pieceSize}px`,
-            top: `-${piece.imageY * pieceSize}px`,
-          }}
-        />
-      </div>
-    );
+    return puzzlePieces.find(p => p.id === position);
   };
 
   return (
@@ -281,15 +304,27 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
               <Card className="p-6">
                 <h3 className="mb-4">Rompecabezas</h3>
                 <div
-                  className="grid gap-1 bg-muted p-2 rounded-lg mx-auto"
-                  style={{
-                    gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
-                    width: 'fit-content',
-                  }}
+                  ref={puzzleAreaRef}
+                  className="relative bg-muted p-2 rounded-lg mx-auto"
+                  style={{ width: '400px', height: '400px' }}
                 >
-                  {Array.from({ length: gridSize * gridSize }, (_, i) => (
-                    <div key={i}>{renderPuzzlePiece(i)}</div>
-                  ))}
+                  {Array.from({ length: gridSize * gridSize }, (_, i) => {
+                    const piece = getPieceAtPosition(i);
+                    return (
+                      <PuzzlePieceComponent
+                        key={i}
+                        imageSrc={uploadedImage ?? ''}
+                        piece={piece}
+                        pieceSize={400 / gridSize}
+                        gridSize={gridSize}
+                        zIndex={piece && draggingId === piece.id ? zIndexCounter : 1}
+                        isDragging={piece && draggingId === piece.id}
+                        onDragStart={handleDragStart}
+                        onDragMove={handleDragMove}
+                        onDragEnd={handleDragEnd}
+                      />
+                    );
+                  })}
                 </div>
                 <p className="text-muted-foreground text-center mt-4">
                   Haz clic en dos piezas para intercambiarlas
