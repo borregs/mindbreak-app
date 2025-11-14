@@ -255,7 +255,7 @@ export default function App() {
                     PNG, JPG, WEBP hasta 10MB
                   </p>
                 </div>
-                <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                <Button className='bechamel' type="button" onClick={() => fileInputRef.current?.click()}>
                   Elegir Imagen
                 </Button>
               </div>
@@ -326,6 +326,7 @@ export default function App() {
             {/* Action Buttons */}
             <div className="flex justify-center gap-4">
               <Button
+                className='bechamel'
                 onClick={handleDownload}
                 disabled={!processedImage}
                 size="lg"
@@ -334,12 +335,14 @@ export default function App() {
                 Descargar Resultado
               </Button>
               <Button
+                className='bechamel-g'
                 onClick={handleReset}
                 variant="outline"
                 size="lg"
               >
                 <Trash2 className="w-5 h-5 mr-2" />
                 Subir Nueva Imagen
+                
               </Button>
             </div>
           </div>
@@ -362,7 +365,7 @@ export default function App() {
             <Button
               onClick={() => setCurrentPage('puzzle')}
               size="lg"
-              className="shrink-0"
+              className="shrink-0 bechamel"
             >
               <Puzzle className="w-5 h-5 mr-2" />
               Crear Rompecabezas
