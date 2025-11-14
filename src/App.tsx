@@ -18,10 +18,25 @@ export default function App() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [files, setFiles] = useState([]);
-  
+  //vv esto solo es para q el css funcione  
+  const [isDragOver, setIsDragOver] = useState(false);
   // shared file input ref must be declared unconditionally (hooks must run in the same order)
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+
+  //borregs draggable css
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragOver(true);
+};
+
+const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragOver(false);
+};
+//end css stuff
+
+  
   if (currentPage === 'puzzle') {
     return <PuzzlePage onNavigateHome={() => setCurrentPage('home')} />;
   }
@@ -254,8 +269,12 @@ const handleFile = async (file: File) => {
 
         {/* Upload Area */}
         {!originalImage && (
-          <div id='cini' onDrop={handleDrop} onDragOver={handleDragOver}>
-            <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
+          <div id='cini'>
+            <Card className={`p-12 border-2 border-dashed border-border hover:border-primary transition-colors drop-zone ${isDragOver ? "drag-over" : ""}`}
+    onDrop={handleDrop}
+    onDragOver={handleDragOver}
+    onDragEnter={handleDragEnter}
+    onDragLeave={handleDragLeave}>
               {/* hidden shared input */}
               <input
                 id="app-file-input"
