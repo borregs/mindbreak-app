@@ -34,20 +34,51 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const puzzleAreaRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const imageDataUrl = e.target?.result as string;
-      setUploadedImage(imageDataUrl);
-      setIsSolved(false);
-      setMoves(0);
-    };
-    reader.readAsDataURL(file);
+  // Reusable function to handle a single image file
+const handleFile = (file: File) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imageDataUrl = e.target?.result as string;
+    setUploadedImage(imageDataUrl);
+    setIsSolved(false);
+    setMoves(0);
   };
+  reader.readAsDataURL(file);
+};
+
+// Your existing input change handler calls handleFile
+const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  handleFile(file);
+};
+
+// New drag-and-drop handler calls handleFile for the dropped file
+const handleImgDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  const droppedFiles = Array.from(e.dataTransfer.files);
+  if (droppedFiles.length === 0) return;
+  handleFile(droppedFiles[0]);
+};
+
+// Also add this to allow dropping
+const handleImgDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+};
+const handleImgDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragOver(true);
+};
+
+const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragOver(false);
+};
+
+
+
 
   const initializePuzzle = () => {
     const totalPieces = gridSize * gridSize;
@@ -225,7 +256,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
         />
 
         {!uploadedImage ? (
-          <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
+          <Card onDragEnter={handleImgDragEnter} onDragLeave={handleImgDragLeave} onDrop={handleImgDrop} onDragOver={handleImgDragOver} className={`p-12 border-2 border-dashed border-border hover:border-primary transition-colors drop-zone ${isDragOver ? "drag-over" : "drag-nover"}`}>
             <label htmlFor="puzzle-file-input" className="cursor-pointer block">
               <div className="flex flex-col items-center gap-4">
                 <div className="p-6 bg-muted rounded-full">
