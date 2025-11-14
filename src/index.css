@@ -1869,4 +1869,16 @@ html {
       transform: scale(1.1); /* Grow to 110% of its original size */
 }.bechamel:active{
       transform: scale(1.05);
+}.drop-zone {
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}.drop-zone.drag-over {
+  border-color: #4caf50; /* green border */
+  background-color: #e8f5e9; /* light green background */
+  box-shadow: 0 0 15px 5px rgba(76, 175, 80, 0.5);
+  transform: scale(1.05);
 }
+
+
