@@ -8,7 +8,7 @@ interface PieceData {
   targetY: number;
   imageX: number; // columna en la imagen
   imageY: number; // fila en la imagen
-  tabs: { top: number; right: number; bottom: number; left: number };
+  // tabs removed — pieces are simple squares now
 }
 
 interface Props {
@@ -21,78 +21,17 @@ interface Props {
   onDragStart: (id: number, pointerX: number, pointerY: number, offsetX: number, offsetY: number) => void;
   onDragMove: (id: number, pointerX: number, pointerY: number) => void;
   onDragEnd: (id: number, pointerX: number, pointerY: number) => void;
+  onSelect?: (id: number) => void;
 }
 
-function generatePiecePath(size: number, tabs: { top: number; right: number; bottom: number; left: number }) {
+function generatePiecePath(size: number) {
   const w = size;
   const h = size;
-  const t = Math.max(6, Math.round(size * 0.18));
-  const cx = w / 2;
-  const cy = h / 2;
-
-  let d = `M 0 0 `;
-
-  // Top
-  if (tabs.top === 0) d += `L ${w} 0 `;
-  else {
-    const dir = tabs.top;
-    const tabW = t * 1.6;
-    const x1 = (w - tabW) / 2;
-    const x2 = x1 + tabW;
-    const by = dir * t;
-    d += `L ${x1} 0 `;
-    d += `C ${x1 + tabW * 0.08} 0 ${cx - tabW * 0.15} ${by} ${cx} ${by} `;
-    d += `C ${cx + tabW * 0.15} ${by} ${x2 - tabW * 0.08} 0 ${x2} 0 `;
-    d += `L ${w} 0 `;
-  }
-
-  // Right
-  if (tabs.right === 0) d += `L ${w} ${h} `;
-  else {
-    const dir = tabs.right;
-    const tabW = t * 1.6;
-    const y1 = (h - tabW) / 2;
-    const y2 = y1 + tabW;
-    const bx = w + dir * t;
-    d += `L ${w} ${y1} `;
-    d += `C ${w} ${y1 + tabW * 0.08} ${bx} ${cy - tabW * 0.15} ${bx} ${cy} `;
-    d += `C ${bx} ${cy + tabW * 0.15} ${w} ${y2 - tabW * 0.08} ${w} ${y2} `;
-    d += `L ${w} ${h} `;
-  }
-
-  // Bottom
-  if (tabs.bottom === 0) d += `L 0 ${h} `;
-  else {
-    const dir = tabs.bottom;
-    const tabW = t * 1.6;
-    const x1 = (w + tabW) / 2;
-    const x2 = x1 - tabW;
-    const by = h + dir * t;
-    const midx = cx;
-    d += `L ${x1} ${h} `;
-    d += `C ${x1 - tabW * 0.08} ${h} ${midx - tabW * 0.15} ${by} ${midx} ${by} `;
-    d += `C ${midx + tabW * 0.15} ${by} ${x2 + tabW * 0.08} ${h} ${x2} ${h} `;
-    d += `L 0 ${h} `;
-  }
-
-  // Left
-  if (tabs.left === 0) d += `Z`;
-  else {
-    const dir = tabs.left;
-    const tabW = t * 1.6;
-    const y1 = (h + tabW) / 2;
-    const y2 = y1 - tabW;
-    const bx = 0 + dir * t;
-    d += `L 0 ${y1} `;
-    d += `C 0 ${y1 - tabW * 0.08} ${bx} ${cy + tabW * 0.15} ${bx} ${cy} `;
-    d += `C ${bx} ${cy - tabW * 0.15} 0 ${y2 + tabW * 0.08} 0 ${y2} `;
-    d += `Z`;
-  }
-
-  return d;
+  // Simple rectangle path (no tabs) for square pieces
+  return `M 0 0 L ${w} 0 L ${w} ${h} L 0 ${h} Z`;
 }
 
-export default function PuzzlePiece({ imageSrc, piece, pieceSize, gridSize, zIndex = 1, isDragging = false, onDragStart, onDragMove, onDragEnd }: Props) {
+export default function PuzzlePiece({ imageSrc, piece, pieceSize, gridSize, zIndex = 1, isDragging = false, onDragStart, onDragMove, onDragEnd, onSelect }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   if (!piece) {
@@ -102,9 +41,8 @@ export default function PuzzlePiece({ imageSrc, piece, pieceSize, gridSize, zInd
   const row = piece.imageY;
   const col = piece.imageX;
 
-  // Use tabs provided by the parent so edges are complementary between neighbors
-  const { top, right, bottom, left } = piece.tabs;
-  const path = generatePiecePath(pieceSize, { top, right, bottom, left });
+  // Simple square piece path
+  const path = generatePiecePath(pieceSize);
   const clipId = `puzzle-clip-${piece.id}`;
 
   const handlePointerDown = (e: React.PointerEvent) => {
@@ -131,6 +69,7 @@ export default function PuzzlePiece({ imageSrc, piece, pieceSize, gridSize, zInd
   return (
     <div
       ref={ref}
+      onClick={() => piece && typeof onSelect === 'function' && onSelect(piece.id)}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

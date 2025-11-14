@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Upload, Download, Trash2, ImageIcon, Puzzle } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
@@ -16,6 +16,9 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  // shared file input ref must be declared unconditionally (hooks must run in the same order)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   if (currentPage === 'puzzle') {
     return <PuzzlePage onNavigateHome={() => setCurrentPage('home')} />;
@@ -47,6 +50,7 @@ export default function App() {
     };
     reader.readAsDataURL(file);
   };
+
 
   const processImage = async (imageUrl: string) => {
     setIsProcessing(true);
@@ -228,13 +232,17 @@ export default function App() {
         {/* Upload Area */}
         {!originalImage && (
           <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
-            <label className="cursor-pointer block">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
+            {/* hidden shared input */}
+            <input
+              id="app-file-input"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+
+            <label htmlFor="app-file-input" className="cursor-pointer block">
               <div className="flex flex-col items-center gap-4">
                 <div className="p-6 bg-muted rounded-full">
                   <Upload className="w-12 h-12 text-muted-foreground" />
@@ -247,7 +255,7 @@ export default function App() {
                     PNG, JPG, WEBP hasta 10MB
                   </p>
                 </div>
-                <Button type="button">
+                <Button type="button" onClick={() => fileInputRef.current?.click()}>
                   Elegir Imagen
                 </Button>
               </div>

@@ -14,7 +14,7 @@ interface PuzzlePiece {
   targetY: number;
   imageX: number;
   imageY: number;
-  tabs: { top: number; right: number; bottom: number; left: number };
+  zIndex?: number;
 }
 
 interface PuzzlePageProps {
@@ -33,6 +33,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const puzzleAreaRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,22 +54,12 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
     const pieces: PuzzlePiece[] = [];
     const pieceSize = 400 / gridSize;
 
-    // Generate complementary tabs for internal edges so adjacent pieces will fit.
-    // horizontalTabs[r][c] is the tab between (r,c) and (r,c+1) (value: 1 or -1)
-    const horizontalTabs: number[][] = Array.from({ length: gridSize }, () => Array.from({ length: Math.max(0, gridSize - 1) }, () => (Math.random() > 0.5 ? 1 : -1)));
-    // verticalTabs[r][c] is the tab between (r,c) and (r+1,c)
-    const verticalTabs: number[][] = Array.from({ length: Math.max(0, gridSize - 1) }, () => Array.from({ length: gridSize }, () => (Math.random() > 0.5 ? 1 : -1)));
-
+  // Simple square pieces: no tabs.
     for (let i = 0; i < totalPieces; i++) {
       const row = Math.floor(i / gridSize);
       const col = i % gridSize;
       const targetX = col * pieceSize;
       const targetY = row * pieceSize;
-
-      const right = col === gridSize - 1 ? 0 : horizontalTabs[row][col];
-      const left = col === 0 ? 0 : -horizontalTabs[row][col - 1];
-      const bottom = row === gridSize - 1 ? 0 : verticalTabs[row][col];
-      const top = row === 0 ? 0 : -verticalTabs[row - 1][col];
 
       pieces.push({
         id: i,
@@ -78,7 +69,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
         targetY,
         imageX: col,
         imageY: row,
-        tabs: { top, right, bottom, left },
+        zIndex: 1,
       });
     }
 
@@ -108,8 +99,18 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   // Keep old click selection minimal (not primary for free movement)
   const handlePieceClick = (positionIndex: number) => {
     if (isSolved) return;
-    if (selectedPiece === positionIndex) setSelectedPiece(null);
-    else setSelectedPiece(positionIndex);
+    if (selectedPiece === positionIndex) {
+      setSelectedPiece(null);
+      return;
+    }
+
+    // bring clicked piece to front
+    setZIndexCounter((z) => {
+      const newZ = z + 1;
+      setPuzzlePieces(prev => prev.map(p => p.id === positionIndex ? { ...p, zIndex: newZ } : p));
+      return newZ;
+    });
+    setSelectedPiece(positionIndex);
   };
 
   // Drag handlers (called from child PuzzlePiece)
@@ -117,7 +118,12 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
 
   const handleDragStart = (id: number, pointerX: number, pointerY: number, offsetX: number, offsetY: number) => {
     setDraggingId(id);
-    setZIndexCounter(z => z + 1);
+    // bump z-index counter and assign to this piece so it appears on top
+    setZIndexCounter((z) => {
+      const newZ = z + 1;
+      setPuzzlePieces(prev => prev.map(p => p.id === id ? { ...p, zIndex: newZ } : p));
+      return newZ;
+    });
     dragStateRef.current = { id, offsetX, offsetY };
   };
 
@@ -208,15 +214,19 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
           </Button>
         </div>
 
+        {/* shared hidden input for both chooser buttons */}
+        <input
+          id="puzzle-file-input"
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageUpload}
+          className="hidden"
+        />
+
         {!uploadedImage ? (
           <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
-            <label className="cursor-pointer block">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
+            <label htmlFor="puzzle-file-input" className="cursor-pointer block">
               <div className="flex flex-col items-center gap-4">
                 <div className="p-6 bg-muted rounded-full">
                   <Upload className="w-12 h-12 text-muted-foreground" />
@@ -229,7 +239,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                     PNG, JPG, WEBP hasta 10MB
                   </p>
                 </div>
-                <Button type="button">
+                <Button type="button" onClick={() => fileInputRef.current?.click()}>
                   Elegir Imagen
                 </Button>
               </div>
@@ -268,20 +278,10 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                   Reiniciar
                 </Button>
 
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <Button type="button" variant="secondary" asChild>
-                    <span>
-                      <Upload className="w-5 h-5 mr-2" />
-                      Nueva Imagen
-                    </span>
-                  </Button>
-                </label>
+                <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="w-5 h-5 mr-2" />
+                  Nueva Imagen
+                </Button>
               </div>
 
               <div className="flex items-center gap-4 mt-4">
@@ -317,11 +317,12 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                         piece={piece}
                         pieceSize={400 / gridSize}
                         gridSize={gridSize}
-                        zIndex={piece && draggingId === piece.id ? zIndexCounter : 1}
+                        zIndex={piece ? (piece.zIndex ?? 1) : 1}
                         isDragging={piece && draggingId === piece.id}
                         onDragStart={handleDragStart}
                         onDragMove={handleDragMove}
                         onDragEnd={handleDragEnd}
+                        onSelect={handlePieceClick}
                       />
                     );
                   })}
