@@ -6,6 +6,7 @@ import { Progress } from './components/ui/progress';
 import { PuzzlePage } from './components/PuzzlePage';
 import '@tensorflow/tfjs';
 import * as bodyPics from '@tensorflow-models/body-pix'
+import { div } from '@tensorflow/tfjs';
 
 type Page = 'home' | 'puzzle';
 
@@ -16,40 +17,57 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
+  const [files, setFiles] = useState([]);
+  
   // shared file input ref must be declared unconditionally (hooks must run in the same order)
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   if (currentPage === 'puzzle') {
     return <PuzzlePage onNavigateHome={() => setCurrentPage('home')} />;
   }
+// Reusable function to handle a single image file
+const handleFile = async (file: File) => {
+  if (!file.type.startsWith('image/')) {
+    setError('Por favor sube un archivo de imagen válido');
+    return;
+  }
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  setError(null);
+  setProcessedImage(null);
+  setProgress(0);
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Por favor sube un archivo de imagen válido');
-      return;
-    }
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const imageDataUrl = e.target?.result as string;
+    setOriginalImage(imageDataUrl);
 
-    // Reset states
-    setError(null);
-    setProcessedImage(null);
-    setProgress(0);
-
-    // Read and display original image
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const imageDataUrl = e.target?.result as string;
-      setOriginalImage(imageDataUrl);
-      
-      // Process the image
-      await processImage(imageDataUrl);
-    };
-    reader.readAsDataURL(file);
+    await processImage(imageDataUrl);
   };
+  reader.readAsDataURL(file);
+};
+
+    // Updated input change handler calls handleFile
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      await handleFile(file);
+    };
+
+    // New drop handler calls handleFile for each dropped file (or just the first)
+    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      if (droppedFiles.length === 0) return;
+
+      // For example, handle only the first dropped image file:
+      await handleFile(droppedFiles[0]);
+    };
+
+    // Also add this to allow dropping
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+    };
+ 
 
 
   const processImage = async (imageUrl: string) => {
@@ -206,7 +224,12 @@ export default function App() {
     setError(null);
   };
 
+
   return (
+    <div>
+    <script type='text/javascript'>
+    
+    </script>
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6">
       <div className="max-w-6xl mx-auto">
         {/* Logo */}
@@ -231,36 +254,38 @@ export default function App() {
 
         {/* Upload Area */}
         {!originalImage && (
-          <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
-            {/* hidden shared input */}
-            <input
-              id="app-file-input"
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
+          <div id='cini' onDrop={handleDrop} onDragOver={handleDragOver}>
+            <Card className="p-12 border-2 border-dashed border-border hover:border-primary transition-colors">
+              {/* hidden shared input */}
+              <input
+                id="app-file-input"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
 
-            <label htmlFor="app-file-input" className="cursor-pointer block">
-              <div className="flex flex-col items-center gap-4">
-                <div className="p-6 bg-muted rounded-full">
-                  <Upload className="w-12 h-12 text-muted-foreground" />
+              <label htmlFor="app-file-input" className="cursor-pointer block">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="p-6 bg-muted rounded-full">
+                    <Upload className="w-12 h-12 text-muted-foreground" />
+                  </div>
+                  <div className="text-center">
+                    <p className="mb-2">
+                      Haz clic para subir o arrastra y suelta
+                    </p>
+                    <p className="text-muted-foreground">
+                      PNG, JPG, WEBP hasta 10MB
+                    </p>
+                  </div>
+                  <Button className='bechamel' type="button" onClick={() => fileInputRef.current?.click()}>
+                    Elegir Imagen
+                  </Button>
                 </div>
-                <div className="text-center">
-                  <p className="mb-2">
-                    Haz clic para subir o arrastra y suelta
-                  </p>
-                  <p className="text-muted-foreground">
-                    PNG, JPG, WEBP hasta 10MB
-                  </p>
-                </div>
-                <Button className='bechamel' type="button" onClick={() => fileInputRef.current?.click()}>
-                  Elegir Imagen
-                </Button>
-              </div>
-            </label>
-          </Card>
+              </label>
+            </Card>
+          </div>
         )}
 
         {/* Processing Progress */}
@@ -396,6 +421,6 @@ export default function App() {
           background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
         }
       `}</style>
-    </div>
+    </div></div>
   );
 }
