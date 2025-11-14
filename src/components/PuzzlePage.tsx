@@ -208,7 +208,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
               </p>
             </div>
           </div>
-          <Button onClick={onNavigateHome} variant="outline" size="lg">
+          <Button onClick={onNavigateHome} variant="outline" size="lg" className='bechamel'>
             <Home className="w-5 h-5 mr-2" />
             Volver al Inicio
           </Button>
@@ -239,7 +239,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                     PNG, JPG, WEBP hasta 10MB
                   </p>
                 </div>
-                <Button type="button" onClick={() => fileInputRef.current?.click()}>
+                <Button type="button" onClick={() => fileInputRef.current?.click()} className='bechamel'>
                   Elegir Imagen
                 </Button>
               </div>
@@ -268,17 +268,17 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                   </Select>
                 </div>
 
-                <Button onClick={shufflePuzzle} variant="default">
-                  <Shuffle className="w-5 h-5 mr-2" />
+                <Button onClick={shufflePuzzle} variant="default" className='bechamel'>
+                  <Shuffle className="w-5 h-5 mr-2 " />
                   Mezclar
                 </Button>
 
-                <Button onClick={initializePuzzle} variant="outline">
+                <Button onClick={initializePuzzle} variant="outline" className='bechamel-r'>
                   <RotateCcw className="w-5 h-5 mr-2" />
                   Reiniciar
                 </Button>
 
-                <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()} className='bechamel-g'>
                   <Upload className="w-5 h-5 mr-2" />
                   Nueva Imagen
                 </Button>
