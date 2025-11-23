@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, Shuffle, RotateCcw, Home, Trophy, Grid3x3 } from 'lucide-react';
+import { Upload, Shuffle, RotateCcw, Home, Trophy, Grid3x3, Puzzle, Image as ImageIcon, ArrowUp, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import PuzzlePieceComponent from './PuzzlePiece';
+import GradientText from './GradientText';
 import { ImageGallery } from './ImageGallery';
 
 interface PuzzlePiece {
   id: number;
-  x: number; // posición actual en px
+  x: number;
   y: number;
-  targetX: number; // posición objetivo en px
+  targetX: number;
   targetY: number;
   imageX: number;
   imageY: number;
@@ -31,62 +32,55 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
   const [zIndexCounter, setZIndexCounter] = useState(1);
   const [isSolved, setIsSolved] = useState(false);
   const [moves, setMoves] = useState(0);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
   const puzzleAreaRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
   // Reusable function to handle a single image file
-const handleFile = (file: File) => {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const imageDataUrl = e.target?.result as string;
-    setUploadedImage(imageDataUrl);
-    setIsSolved(false);
-    setMoves(0);
+  const handleFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageDataUrl = e.target?.result as string;
+      setUploadedImage(imageDataUrl);
+      setIsSolved(false);
+      setMoves(0);
+    };
+    reader.readAsDataURL(file);
   };
-  reader.readAsDataURL(file);
-};
 
-// Your existing input change handler calls handleFile
-const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  handleFile(file);
-};
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    handleFile(file);
+  };
 
-// New drag-and-drop handler calls handleFile for the dropped file
-const handleImgDrop = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-  const droppedFiles = Array.from(e.dataTransfer.files);
-  if (droppedFiles.length === 0) return;
-  handleFile(droppedFiles[0]);
-};
+  const handleImgDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    if (droppedFiles.length === 0) return;
+    handleFile(droppedFiles[0]);
+  };
 
-// Also add this to allow dropping
-const handleImgDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-};
-const handleImgDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-  setIsDragOver(true);
-};
+  const handleImgDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+  
+  const handleImgDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
 
-const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-  e.preventDefault();
-  setIsDragOver(false);
-};
-
-
-
+  const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
 
   const initializePuzzle = () => {
     const totalPieces = gridSize * gridSize;
     const pieces: PuzzlePiece[] = [];
     const pieceSize = 400 / gridSize;
 
-  // Simple square pieces: no tabs.
     for (let i = 0; i < totalPieces; i++) {
       const row = Math.floor(i / gridSize);
       const col = i % gridSize;
@@ -117,7 +111,6 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
 
     const shuffled = puzzlePieces.map(p => ({ ...p }));
 
-    // Scatter pieces randomly inside the puzzle area
     for (let p of shuffled) {
       p.x = Math.random() * (areaSize - pieceSize - padding * 2) + padding;
       p.y = Math.random() * (areaSize - pieceSize - padding * 2) + padding;
@@ -128,7 +121,6 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     setMoves(0);
   };
 
-  // Keep old click selection minimal (not primary for free movement)
   const handlePieceClick = (positionIndex: number) => {
     if (isSolved) return;
     if (selectedPiece === positionIndex) {
@@ -136,7 +128,6 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
       return;
     }
 
-    // bring clicked piece to front
     setZIndexCounter((z) => {
       const newZ = z + 1;
       setPuzzlePieces(prev => prev.map(p => p.id === positionIndex ? { ...p, zIndex: newZ } : p));
@@ -145,12 +136,10 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     setSelectedPiece(positionIndex);
   };
 
-  // Drag handlers (called from child PuzzlePiece)
   const dragStateRef = useRef<{ id: number | null; offsetX: number; offsetY: number } | null>(null);
 
   const handleDragStart = (id: number, pointerX: number, pointerY: number, offsetX: number, offsetY: number) => {
     setDraggingId(id);
-    // bump z-index counter and assign to this piece so it appears on top
     setZIndexCounter((z) => {
       const newZ = z + 1;
       setPuzzlePieces(prev => prev.map(p => p.id === id ? { ...p, zIndex: newZ } : p));
@@ -182,7 +171,6 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     const releasedX = pointerX - area.left - (state?.offsetX ?? 0);
     const releasedY = pointerY - area.top - (state?.offsetY ?? 0);
 
-    // Snap if within tolerance
     const tolerance = Math.max(12, pieceSize * 0.12);
 
     setPuzzlePieces(prev => {
@@ -197,7 +185,6 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
         return { ...p, x: Math.max(0, Math.min(releasedX, 400 - pieceSize)), y: Math.max(0, Math.min(releasedY, 400 - pieceSize)) };
       });
 
-      // After drop, check solved
       const allSnapped = next.every(p => Math.hypot(p.x - p.targetX, p.y - p.targetY) <= Math.max(8, pieceSize * 0.08));
       if (allSnapped) setIsSolved(true);
 
@@ -218,35 +205,79 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Logo */}
-        <div className="mb-8">
-          <h2 className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            breakmind
-          </h2>
-        </div>
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-primary rounded-xl">
-              <Grid3x3 className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-4xl">Rompecabezas de Imagen</h1>
-              <p className="text-muted-foreground">
-                Crea y resuelve tu propio rompecabezas
-              </p>
-            </div>
+    <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
+      
+      {/* --- NAVBAR: Identical to App.tsx --- */}
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          
+          {/* Logo - Goes Home */}
+          <div 
+            className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" 
+            onClick={onNavigateHome}
+          >
+            <GradientText 
+                          colors={["#1E88E5", "#4f79ff", "#8E24AA", "#4079ff", "#F024ff"]}
+                          animationSpeed={8}
+                          showBorder={false}
+                          className="font-bold text-2xl tracking-tighter custom-class"
+                        >
+               BREAKMIND 
+            </GradientText>
           </div>
-          <Button onClick={onNavigateHome} variant="outline" size="lg" className='bechamel'>
-            <Home className="w-5 h-5 mr-2" />
-            Volver al Inicio
-          </Button>
-        </div>
+          
+          {/* Navigation Buttons */}
+          <nav className="navitems flex items-center gap-2 sm:gap-4">
+            
+            {/* Eliminar Fondo (Inactive State) */}
+            <button 
+              onClick={onNavigateHome} 
+              className="bechamel px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
+            >
+              Eliminar Fondo
+            </button>
 
-        {/* shared hidden input for both chooser buttons */}
+            {/* Rompecabezas (Active State - 'selected') */}
+            <button 
+              className="selected group px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2"
+            >
+              <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
+              Rompecabezas
+            </button>
+
+            {/* Nosotros (Static for consistency) */}
+            <button 
+              className="hidden sm:block px-4 py-2 text-sm font-medium text-slate-600 hover:text-primary transition-colors cursor-not-allowed opacity-50"
+              title="Solo disponible en Inicio"
+            >
+              Nosotros
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <div className="flex-grow w-full max-w-6xl mx-auto px-6 py-12">
+        
+        {/* Page Title */}
+        <div className="text-center mb-10 flex flex-col items-center">
+            
+            {/* --- HEADER FIX: Side-by-Side Icon and Title --- */}
+            <div className="flex items-center gap-4 mb-4">
+                <div className="p-4 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl shadow-lg shadow-pink-200 transform hover:scale-105 transition-transform duration-300">
+                    <Grid3x3 className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
+                    Rompecabezas de Imagen
+                </h1>
+            </div>
+            
+             <p className="text-lg text-slate-500 max-w-2xl">
+                Crea y resuelve tu propio rompecabezas personalizado
+            </p>
+        </div>
+        <br />
+
+        {/* Hidden Input */}
         <input
           id="puzzle-file-input"
           ref={fileInputRef}
@@ -257,47 +288,61 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
         />
 
         {!uploadedImage ? (
-          <>
-          <Card onDragEnter={handleImgDragEnter} onDragLeave={handleImgDragLeave} onDrop={handleImgDrop} onDragOver={handleImgDragOver} className={`p-12 border-2 border-dashed border-border hover:border-primary transition-colors drop-zone ${isDragOver ? "drag-over" : "drag-nover"}`}>
-            <label htmlFor="puzzle-file-input" className="cursor-pointer block">
-              <div className="flex flex-col items-center gap-4">
-                <div className="p-6 bg-muted rounded-full">
-                  <Upload className="w-12 h-12 text-muted-foreground" />
+           <div className='animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-4xl mx-auto space-y-8'>
+            
+            {/* UPLOAD CARD - No Green Aura, Just Clean Slate/Primary */}
+            <Card 
+                className={`p-12 border-2 border-dashed transition-all duration-300 
+                    ${isDragOver 
+                        ? "border-primary bg-primary/5 scale-[1.01] shadow-xl ring-2 ring-primary/20" 
+                        : "border-slate-200 hover:border-primary/50 hover:shadow-md"
+                    }`}
+                onDragEnter={handleImgDragEnter} 
+                onDragLeave={handleImgDragLeave} 
+                onDrop={handleImgDrop} 
+                onDragOver={handleImgDragOver}
+            >
+              <label htmlFor="puzzle-file-input" className="cursor-pointer block">
+                <div className="flex flex-col items-center gap-6 py-4">
+                  <div className={`greybtn p-6 rounded-full transition-colors duration-300 ${isDragOver ? 'bg-primary/10 text-primary' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}>
+                    <Upload className="" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className={`text-xl font-semibold transition-colors ${isDragOver ? 'text-primary' : 'text-slate-700'}`}>
+                      {isDragOver ? "¡Suéltala para procesar!" : "Sube una imagen para crear tu rompecabezas"}
+                    </p>
+                    <p className="text-sm text-slate-400">
+                      PNG, JPG, WEBP hasta 10MB
+                    </p>
+                  </div>
+                  <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
+                       Elegir Imagen   
+                  </Button>
                 </div>
-                <div className="text-center">
-                  <p className="mb-2">
-                    Sube una imagen para crear tu rompecabezas
-                  </p>
-                  <p className="text-muted-foreground">
-                    PNG, JPG, WEBP hasta 10MB
-                  </p>
-                </div>
-                <Button type="button" onClick={() => fileInputRef.current?.click()} className='bechamel'>
-                  Elegir Imagen
-                </Button>
-              </div>
-            </label>
-          </Card>
-          <ImageGallery 
+              </label>
+            </Card>
+
+             {/* Image Gallery for Quick Start */}
+             <ImageGallery 
                 onSelect={(url) => {
                     setUploadedImage(url);
                     setIsSolved(false);
                     setMoves(0);
                 }} 
             />
-          </>
+          </div>
         ) : (
-          <div className="space-y-6">
+          <div className="maincont space-y-6 animate-in zoom-in-95 duration-500">
             {/* Controls */}
-            <Card className="p-6">
-              <div className="flex flex-wrap items-end gap-4">
+            <Card className="p-6 border-0 shadow-lg">
+              <div className="flex flex-wrap items-end gap-4 justify-between">
                 <div className="flex-1 min-w-[200px]">
-                  <Label>Dificultad del Rompecabezas</Label>
+                  <Label>Dificultad</Label>
                   <Select
                     value={gridSize.toString()}
                     onValueChange={(value) => setGridSize(Number(value))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-[180px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -309,45 +354,50 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
                   </Select>
                 </div>
 
-                <Button onClick={shufflePuzzle} variant="default" className='bechamel'>
-                  <Shuffle className="w-5 h-5 mr-2 " />
-                  Mezclar
-                </Button>
+                <div className="flex gap-3">
+                    <Button onClick={shufflePuzzle} className='bechamel'>
+                    <Shuffle className="w-5 h-5 mr-2" />
+                    Mezclar
+                    </Button>
 
-                <Button onClick={initializePuzzle} variant="outline" className='bechamel-r'>
-                  <RotateCcw className="w-5 h-5 mr-2" />
-                  Reiniciar
-                </Button>
+                    <Button onClick={initializePuzzle} variant="outline" className='bechamel-r border-2 hover:bg-slate-50'>
+                    <RotateCcw className="w-5 h-5 mr-2" />
+                    Reiniciar
+                    </Button>
 
-                <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()} className='bechamel-g'>
-                  <Upload className="w-5 h-5 mr-2" />
-                  Nueva Imagen
-                </Button>
+                    <Button type="button" variant="secondary" onClick={() => fileInputRef.current?.click()} className='bechamel-g'>
+                    <Upload className="w-5 h-5 mr-2 " />
+                    Nueva Imagen
+                    </Button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Movimientos:</span>
-                  <span>{moves}</span>
+              <div className="flex items-center gap-4 mt-6 pt-6 border-t">
+                <div className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full">
+                  <span className="text-slate-500 text-sm font-medium">Movimientos:</span>
+                  <span className="font-bold text-slate-900">{moves}</span>
                 </div>
                 {isSolved && (
-                  <div className="flex items-center gap-2 text-green-600">
+                  <div className="flex items-center gap-2 text-green-600 bg-green-50 px-4 py-2 rounded-full animate-pulse">
                     <Trophy className="w-5 h-5" />
-                    <span>¡Rompecabezas Resuelto!</span>
+                    <span className="font-bold">¡Rompecabezas Resuelto!</span>
                   </div>
                 )}
               </div>
             </Card>
 
-            {/* Puzzle Grid */}
-            <div className="grid md:grid-cols-2 gap-6">
+            {/* Puzzle Grid - FIXED: Grid Layout for Side-by-Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 place-items-center items-start">
               {/* Puzzle Area */}
-              <Card className="p-6">
-                <h3 className="mb-4">Rompecabezas</h3>
+              <Card className="p-8 border-0 shadow-lg flex flex-col items-center w-full max-w-[500px]">
+                <h3 className="mb-6 font-bold text-slate-700 flex items-center gap-2">
+                    <Puzzle className="w-5 h-5 text-purple-500" /> 
+                    Arma el Rompecabezas
+                </h3>
                 <div
                   ref={puzzleAreaRef}
-                  className="relative bg-muted p-2 rounded-lg mx-auto"
-                  style={{ width: '400px', height: '400px' }}
+                  className="relative bg-slate-100/50 p-1 rounded-xl shadow-inner border border-slate-200"
+                  style={{ width: '402px', height: '402px' }}
                 >
                   {Array.from({ length: gridSize * gridSize }, (_, i) => {
                     const piece = getPieceAtPosition(i);
@@ -368,29 +418,61 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
                     );
                   })}
                 </div>
-                <p className="text-muted-foreground text-center mt-4">
-                  Haz clic en dos piezas para intercambiarlas
+                <p className="text-slate-400 text-sm text-center mt-6">
+                  Arrastra las piezas a su lugar correcto
                 </p>
               </Card>
 
               {/* Reference Image */}
-              <Card className="p-6">
-                <h3 className="mb-4">Referencia</h3>
-                <div className="bg-muted p-2 rounded-lg">
+              <Card className="p-8 border-0 shadow-lg flex flex-col items-center w-full max-w-[500px]">
+                <h3 className="mb-6 font-bold text-slate-700 flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-blue-500" />
+                    Referencia
+                </h3>
+                <div className="bg-slate-100 p-2 rounded-xl shadow-inner border border-slate-200">
                   <img
                     src={uploadedImage}
                     alt="Referencia"
-                    className="w-full max-w-[400px] mx-auto rounded"
+                    className="refimg object-contain rounded-lg opacity-90"
                   />
                 </div>
-                <p className="text-muted-foreground text-center mt-4">
-                  Imagen original como referencia
+                <p className="text-slate-400 text-sm text-center mt-6">
+                  Imagen original para guiarte
                 </p>
               </Card>
             </div>
           </div>
         )}
       </div>
+      {/* --- FOOTER --- */}
+      <footer id="footer" className="footing text-white mt-auto" style={{ background: 'linear-gradient(90deg, #8E24AA 0%, #1E88E5 100%)' }}>
+        <div className="max-w-7xl mx-auto px-6 py-16">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="space-y-6">
+                    <h2 className="text-3xl font-bold">Síguenos en Redes Sociales</h2>
+                    <div className="flex gap-4">
+                        {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+                            <a key={i} href="#" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
+                                <Icon className="w-6 h-6" />
+                            </a>
+                        ))}
+                    </div>
+                </div>
+                <div className="space-y-4 text-white/90">
+                    <h3 className="text-2xl font-bold">Quiénes Somos</h3>
+                    <p className="leading-relaxed">
+                        Somos un equipo de desarrolladores, diseñadores y analistas comprometidos con crear herramientas web innovadoras que transformen la manera en que interactúas con tus imágenes y tu imaginación.
+                    </p>
+                </div>
+            </div>
+            <div className="border-t border-white/20 mt-12 pt-8 flex justify-between items-center text-sm text-white/60">
+                <p>© 2025 Breakmind. Todos los derechos reservados.</p>
+                <button onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})} className="p-2 bg-white/10 rounded-full hover:bg-white/20">
+                    <ArrowUp className="w-5 h-5" />
+                </button>
+            </div>
+        </div>
+      </footer>
     </div>
   );
 }
