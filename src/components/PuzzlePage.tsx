@@ -5,6 +5,7 @@ import { Card } from './ui/card';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import PuzzlePieceComponent from './PuzzlePiece';
+import { ImageGallery } from './ImageGallery';
 
 interface PuzzlePiece {
   id: number;
@@ -256,6 +257,7 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
         />
 
         {!uploadedImage ? (
+          <>
           <Card onDragEnter={handleImgDragEnter} onDragLeave={handleImgDragLeave} onDrop={handleImgDrop} onDragOver={handleImgDragOver} className={`p-12 border-2 border-dashed border-border hover:border-primary transition-colors drop-zone ${isDragOver ? "drag-over" : "drag-nover"}`}>
             <label htmlFor="puzzle-file-input" className="cursor-pointer block">
               <div className="flex flex-col items-center gap-4">
@@ -276,6 +278,14 @@ const handleImgDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
               </div>
             </label>
           </Card>
+          <ImageGallery 
+                onSelect={(url) => {
+                    setUploadedImage(url);
+                    setIsSolved(false);
+                    setMoves(0);
+                }} 
+            />
+          </>
         ) : (
           <div className="space-y-6">
             {/* Controls */}
