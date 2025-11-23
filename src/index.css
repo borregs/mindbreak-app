@@ -1856,7 +1856,7 @@ html {
 }
 .bechamel{
       transition: transform 0.3s ease-in-out; /* Smooth transition for transform changes */
-      cursor:grabbing;
+      cursor:auto;
 }.bechamel-g:hover{
       background-color: green;
       transform: scale(1.1); /* Grow to 110% of its original size */
@@ -1924,6 +1924,31 @@ html {
       color: #ffffff;
       transform: scale(1.1); /* Grow to 110% of its original size */
 
+}.refimg{
+  height: 400px;
+  width: 400px;
+}.float-right{
+  float: right;
+}.navitems{
+  margin-right: 60px;
+}.bg-checkerboard {
+          background-image: 
+            linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
+            linear-gradient(-45deg, #cbd5e1 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #cbd5e1 75%),
+            linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+          background-size: 20px 20px;
+          background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}.greybtn{
+  background-color: lightgray;
+}.footing{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 50;
+}.maincont{
+  padding-bottom: 500px;
 }
 
 
