@@ -67,4 +67,6 @@
   animation: gradient linear infinite;
 }.custom-class{
     font-weight: bolder;
+    font-size: larger;
+    margin-left: 60px;
 }
