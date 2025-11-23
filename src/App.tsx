@@ -164,7 +164,9 @@ export default function App() {
     const link = document.createElement('a');
     link.href = processedImage;
     link.download = 'background-removed.png';
+    document.body.appendChild(link); // Safer for some browsers
     link.click();
+    document.body.removeChild(link);
   };
 
   const handleReset = () => {
@@ -192,19 +194,15 @@ export default function App() {
               showBorder={false}
               className="font-bold text-2xl tracking-tighter custom-class"
             >
-              BREAKMIND
+               BREAKMIND 
             </GradientText>
           </div>
           
           {/* Navigation Links - Top Right */}
-          <nav className="flex items-center gap-1 sm:gap-6">
+          <nav className="navitems flex items-center gap-1 sm:gap-6">
             <button 
               onClick={() => setCurrentPage('home')} 
-              className={`selected px-4 py-2 text-sm font-medium rounded-full transition-all float-left ${
-                currentPage === 'home' 
-                  ? 'bg-primary/10 text-primary' 
-                  : 'text-slate-600 hover:text-primary hover:bg-slate-50'
-              }`}
+              className={`selected px-4 py-2 text-sm font-medium rounded-full transition-all float-left `}
             >
               Eliminar Fondo
             </button>
@@ -212,13 +210,9 @@ export default function App() {
             {/* THE PUZZLE BUTTON */}
             <button 
               onClick={() => setCurrentPage('puzzle')} 
-              className={`bechamel group px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 ${
-                currentPage === 'puzzle' 
-                  ? 'bg-purple-100 text-purple-700' 
-                  : 'text-slate-600 hover:text-purple-600 hover:bg-purple-50'
-              }`}
+              className={`bechamel group px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 `}
             >
-              <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 ${currentPage === 'puzzle' ? 'fill-current' : ''}`} />
+              <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
               Rompecabezas
             </button>
 
@@ -233,21 +227,22 @@ export default function App() {
       </header>
 
       {/* --- MAIN CONTENT --- */}
-      <main className="flex-grow w-full max-w-6xl mx-auto px-6 py-12">
+      <main className="maincont flex-grow w-full max-w-6xl mx-auto px-6 py-12">
         
         {/* Header Section */}
         <div className="text-center mb-12 flex flex-col items-center">
             
-            {/* ICON RESTORED (Purple Gradient Box) */}
-            <div className="mb-6 p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-200 transform hover:scale-105 transition-transform duration-300">
-                <ImageIcon className="w-8 h-8 text-white" />
-            </div>
+            {/* Fixed: Icon and Title side-by-side */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-200 transform hover:scale-105 transition-transform duration-300">
+                  <ImageIcon className="w-8 h-8 text-white" />
+              </div>
 
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-4">
-                Eliminador de Fondo
-            </h1>
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
+                  Eliminador de Fondo
+              </h1>
+            </div>
             
-        {/* BADGES FIXED: Using custom CSS classes for better color pop */}
             <div className="flex items-center justify-center gap-4 mb-8">
                 <span className="badge-ai">
                     <Wand2 className="w-4 h-4" /> IA Avanzada
@@ -266,8 +261,14 @@ export default function App() {
         <div className="max-w-4xl mx-auto">
             {!originalImage && (
             <div className='animate-in fade-in slide-in-from-bottom-4 duration-700'>
+                
+                {/* UPLOAD CARD - Restored to clean Slate/Primary interaction (No Green Aura) */}
                 <Card 
-                    className={`p-10 border-2 border-dashed transition-all duration-300 ${isDragOver ? "border-primary bg-primary/5 scale-[1.02]" : "border-slate-200 hover:border-primary/50"}`}
+                    className={`p-12 border-2 border-dashed transition-all duration-300 
+                        ${isDragOver 
+                            ? "border-primary bg-primary/5 scale-[1.02] shadow-xl ring-2 ring-primary/20" 
+                            : "border-slate-200 hover:border-primary/50 hover:shadow-md"
+                        }`}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragEnter={handleDragEnter}
@@ -283,26 +284,29 @@ export default function App() {
                     />
 
                     <label htmlFor="app-file-input" className="cursor-pointer block w-full">
-                        <div className="flex flex-col items-center gap-6 py-8">
-                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-2 shadow-sm group-hover:scale-110 transition-transform border border-slate-100">
-                                <Upload className="w-8 h-8 text-slate-400" />
+                        <div className="flex flex-col items-center gap-6 py-4">
+                             {/* Icon Circle Changes Color on Hover */}
+                            <div className={`greybtn p-6 rounded-full transition-colors duration-300 ${isDragOver ? 'bg-primary/10 text-primary' : 'bg-slate-50 text-slate-400 border border-slate-100'}`}>
+                                <Upload className="" />
                             </div>
+                            
                             <div className="text-center space-y-2">
-                                <p className="text-xl font-semibold text-slate-700">
-                                Haz clic para subir o arrastra y suelta
+                                <p className={`text-xl font-semibold transition-colors ${isDragOver ? 'text-primary' : 'text-slate-700'}`}>
+                                    {isDragOver ? "¡Suéltala para procesar!" : "Haz clic para subir o arrastra y suelta"}
                                 </p>
                                 <p className="text-slate-400">
-                                PNG, JPG, WEBP hasta 10MB
+                                    PNG, JPG, WEBP hasta 10MB
                                 </p>
                             </div>
-                            <Button className='bg-slate-900 text-white hover:bg-slate-800 px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
-                                Elegir Imagen
+                            
+                            <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
+                                   Elegir Imagen   
                             </Button>
                         </div>
                     </label>
                 </Card>
                 
-                {/* --- The Carousel (Now with squares) --- */}
+                {/* --- The Carousel --- */}
                 <ImageGallery 
                     onSelect={(url) => {
                         setOriginalImage(url);
@@ -370,13 +374,23 @@ export default function App() {
                 </Card>
                 </div>
 
-                {/* Actions */}
+                {/* Actions - DOWNLOAD BUTTON IS HERE */}
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button className='bg-slate-900 hover:bg-slate-800 h-12 px-8 text-lg shadow-xl hover:translate-y-[-2px] transition-all' onClick={handleDownload}>
-                    <Download className="w-5 h-5 mr-2" /> Descargar HD
+                <Button 
+                    className='bechamel h-12 px-8 text-lg shadow-xl hover:translate-y-[-2px] transition-all' 
+                    onClick={handleDownload}
+                >
+                    <Download className="w-5 h-5 mr-2" /> 
+                    Descargar Resultado
                 </Button>
-                <Button className='h-12 px-8 text-lg border-2 hover:bg-slate-50' onClick={handleReset} variant="outline">
-                    <Trash2 className="w-5 h-5 mr-2" /> Nueva Imagen
+                
+                <Button 
+                    className='bechamel-g h-12 px-8 text-lg border-2 hover:bg-slate-50' 
+                    onClick={handleReset} 
+                    variant="outline"
+                >
+                    <Trash2 className="w-5 h-5 mr-2" /> 
+                    Subir Nueva Imagen
                 </Button>
                 </div>
             </div>
@@ -385,7 +399,7 @@ export default function App() {
       </main>
 
       {/* --- FOOTER --- */}
-      <footer id="footer" className="bg-gradient-to-r from-blue-600 via-purple-600 to-purple-700 text-white mt-auto">
+      <footer id="footer" className="footing fixed bottom-0 left-0 w-full z-50 text-white mt-auto" style={{ background: 'linear-gradient(90deg, #8E24AA 0%, #1E88E5 100%)' }}>
         <div className="max-w-7xl mx-auto px-6 py-16">
             <div className="grid md:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
@@ -413,18 +427,6 @@ export default function App() {
             </div>
         </div>
       </footer>
-
-      <style>{`
-        .bg-checkerboard {
-          background-image: 
-            linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
-            linear-gradient(-45deg, #cbd5e1 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, #cbd5e1 75%),
-            linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
-                  background-size: 20px 20px;
-          background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-      `}</style>
     </div>
   );
 }
