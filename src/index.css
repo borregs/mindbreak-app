@@ -1856,7 +1856,7 @@ html {
 }
 .bechamel{
       transition: transform 0.3s ease-in-out; /* Smooth transition for transform changes */
-      cursor:grabbing;
+      cursor:auto;
 }.bechamel-g:hover{
       background-color: green;
       transform: scale(1.1); /* Grow to 110% of its original size */
@@ -1879,6 +1879,76 @@ html {
   background-color: #e8f5e9; /* light green background */
   box-shadow: 0 0 15px 5px rgba(76, 175, 80, 0.5);
   transform: scale(1.05);
+}.float-left{
+  float:left;
+}.badge-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  /* The "Pop" Magic: Gradient + Shadow */
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); /* Blue gradient */
+  color: #0369a1; /* Darker blue text */
+  border: 1px solid #7dd3fc;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.badge-ai:hover {
+  transform: translateY(-1px);
+}
+
+.badge-free {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  /* The "Pop" Magic: Gradient + Shadow */
+  background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); /* Purple gradient */
+  color: #9333ea; /* Darker purple text */
+  border: 1px solid #d8b4fe;
+  box-shadow: 0 2px 4px rgba(147, 51, 234, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.badge-free:hover {
+  transform: translateY(-1px);
+}.selected{
+      background-color: #030213;
+      color: #ffffff;
+      transform: scale(1.1); /* Grow to 110% of its original size */
+
+}.refimg{
+  height: 400px;
+  width: 400px;
+}.float-right{
+  float: right;
+}.navitems{
+  margin-right: 60px;
+}.bg-checkerboard {
+          background-image: 
+            linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
+            linear-gradient(-45deg, #cbd5e1 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #cbd5e1 75%),
+            linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+          background-size: 20px 20px;
+          background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}.greybtn{
+  background-color: lightgray;
+}.footing{
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 50;
+}.maincont{
+  padding-bottom: 500px;
 }
 
 
