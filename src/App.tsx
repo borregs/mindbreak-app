@@ -180,7 +180,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
       
      {/* --- NAVBAR FIXED --- */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm p-2">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           {/* Logo (Clickable to go Home) */}
@@ -192,7 +192,7 @@ export default function App() {
               colors={["#1E88E5", "#4f79ff", "#8E24AA", "#4079ff", "#F024ff"]}
               animationSpeed={8}
               showBorder={false}
-              className="font-bold text-2xl tracking-tighter custom-class"
+              className="font-bold text-2xl tracking-tighter custom-class mx-2"
             >
                BREAKMIND 
             </GradientText>
@@ -202,18 +202,17 @@ export default function App() {
           <nav className="navitems flex items-center gap-1 sm:gap-6">
             <button 
               onClick={() => setCurrentPage('home')} 
-              className={`selected px-4 py-2 text-sm font-medium rounded-full transition-all float-left `}
+              className={`selected mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left `}
             >
-              <ImageIcon className="w-4 h-4 text-white " />
               Eliminar Fondo
             </button>
-              
+
             {/* THE PUZZLE BUTTON */}
             <button 
               onClick={() => setCurrentPage('puzzle')} 
-              className={`bechamel float-right group px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 `}
+              className={`bechamel group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 `}
             >
-              <Puzzle className={`w-4 h-4  `} />
+              <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
               Rompecabezas
             </button>
 
@@ -234,8 +233,8 @@ export default function App() {
         <div className="text-center mb-12 flex flex-col items-center">
             
             {/* Fixed: Icon and Title side-by-side */}
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-200 transform hover:scale-105 transition-transform duration-300">
+            <div className="flex items-center gap-4 mt-4 mb-4">
+              <div className="p-4 bg-gradient-to-br rounded from-indigo-500 to-purple-600 rounded-2xl shadow-lg shadow-purple-200 transform hover:scale-105 transition-transform duration-300">
                   <ImageIcon className="w-8 h-8 text-white" />
               </div>
 
@@ -400,14 +399,17 @@ export default function App() {
       </main>
 
       {/* --- FOOTER --- */}
-      <footer id="footer" className="footing fixed bottom-0 left-0 w-full z-50 text-white mt-auto" style={{ background: 'linear-gradient(90deg, #8E24AA 0%, #1E88E5 100%)' }}>
+      <footer id="footer" className="footing fixed bottom-0 left-0 w-full z-50 text-white" style={{ background: 'linear-gradient(90deg, #8E24AA 0%, #1E88E5 100%)' }}>
         <div className="max-w-7xl mx-auto px-6 py-16">
             <div className="grid md:grid-cols-2 gap-12 items-center">
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold">Síguenos en Redes Sociales</h2>
                     <div className="flex gap-4">
-                        {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                            <a key={i} href="#" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
+                        {[
+                            { Icon: Twitter, href: "https://x.com/BreakMind35660" },
+                            { Icon: Instagram, href: "https://www.instagram.com/breakmindsw/" }
+                        ].map(({ Icon, href }, i) => (
+                            <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
                                 <Icon className="w-6 h-6" />
                             </a>
                         ))}
