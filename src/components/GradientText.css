@@ -1,6 +1,7 @@
 .animated-gradient-text {
   position: relative;
-  margin: 0 auto;
+  margin: 0;
+  padding: 1em;
   display: flex;
   max-width: fit-content;
   flex-direction: row;
@@ -67,6 +68,6 @@
   animation: gradient linear infinite;
 }.custom-class{
     font-weight: bolder;
-    font-size: larger;
+    font-size: 3.5rem;
     margin-left: 60px;
 }

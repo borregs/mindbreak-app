@@ -439,6 +439,10 @@
     margin-inline: auto;
   }
 
+  .mx-2 {
+    margin-inline: calc(var(--spacing) * 2);
+  }
+
   .my-1 {
     margin-block: calc(var(--spacing) * 1);
   }
@@ -457,6 +461,14 @@
 
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
+  }
+
+  .mr-3 {
+    margin-right: calc(var(--spacing) * 3);
+  }
+
+  .ml-3 {
+    margin-left: calc(var(--spacing) * 3);
   }
 
   .mb-2 {
@@ -1942,7 +1954,7 @@ html {
 }.greybtn{
   background-color: lightgray;
 }.footing{
-  position: fixed;
+  position: static;
   left: 0;
   bottom: 0;
   width: 100%;
