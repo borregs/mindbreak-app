@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { FaTwitter, FaTiktok, FaFacebook, FaInstagram, FaXTwitter  } from 'react-icons/fa6';
+
 import { Upload, Shuffle, RotateCcw, Home, Trophy, Grid3x3, Puzzle, Image as ImageIcon, ArrowUp, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
@@ -6,7 +8,7 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import PuzzlePieceComponent from './PuzzlePiece';
 import GradientText from './GradientText';
-import { ImageGallery } from './ImageGallery';
+import { PuzzleGallery } from './PuzzleGallery';
 
 interface PuzzlePiece {
   id: number;
@@ -234,7 +236,9 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
               onClick={onNavigateHome} 
               className="bechamel mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
             >
-              Eliminar Fondo
+              <ImageIcon className='w-4 h-4 '></ImageIcon>
+
+               Eliminar Fondo
             </button>
 
             {/* Rompecabezas (Active State - 'selected') */}
@@ -323,7 +327,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
             </Card>
 
              {/* Image Gallery for Quick Start */}
-             <ImageGallery 
+             <PuzzleGallery 
                 onSelect={(url) => {
                     setUploadedImage(url);
                     setIsSolved(false);
@@ -451,15 +455,18 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold">Síguenos en Redes Sociales</h2>
                     <div className="flex gap-4">
-                        {[
-                            { Icon: Twitter, href: "https://x.com/BreakMind35660" },
-                            { Icon: Instagram, href: "https://www.instagram.com/breakmindsw/" }
-                        ].map(({ Icon, href }, i) => (
-                            <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
-                                <Icon className="w-6 h-6" />
-                            </a>
-                        ))}
-                    </div>
+                                           
+                                            {[
+                                                { Icon: FaXTwitter , href: "https://x.com/BreakMind35660" },
+                                                { Icon: FaInstagram, href: "https://www.instagram.com/breakmindsw/" },
+                                                { Icon: FaTiktok, href: "https://www.tiktok.com/@break_mind.tecmxli" },
+                                                { Icon: FaFacebook, href: "https://www.facebook.com/profile.php?id=61584273899299" }
+                                            ].map(({ Icon, href }, i) => (
+                                                <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
+                                                    <Icon className="w-8 h-8" />
+                                                </a>
+                                            ))}
+                                        </div>
                 </div>
                 <div className="space-y-4 text-white/90">
                     <h3 className="text-2xl font-bold">Quiénes Somos</h3>
