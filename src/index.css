@@ -1877,6 +1877,7 @@ html {
       transform: scale(1.1); /* Grow to 110% of its original size */
 }
 .bechamel:hover{
+      color: #ffffff;
       background-color: #9810fa;
       transform: scale(1.1); /* Grow to 110% of its original size */
 }.bechamel:active{
@@ -1960,5 +1961,9 @@ html {
   width: 100%;
   z-index: 50;
 }.maincont{
-  padding-bottom: 500px;
+  padding-bottom: 200px;
+}.navitems > button > svg{
+  display: inline-block;
+}.footing >*{
+  margin-left: 5px;
 }
