@@ -208,7 +208,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
       
       {/* --- NAVBAR: Identical to App.tsx --- */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm p-2">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           {/* Logo - Goes Home */}
@@ -232,15 +232,14 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
             {/* Eliminar Fondo (Inactive State) */}
             <button 
               onClick={onNavigateHome} 
-              className="bechamel px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
+              className="bechamel mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
             >
-              <ImageIcon className="w-4 h-4 " />
               Eliminar Fondo
             </button>
-              
+
             {/* Rompecabezas (Active State - 'selected') */}
             <button 
-              className="selected group px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2"
+              className="selected group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2"
             >
               <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
               Rompecabezas
@@ -257,14 +256,14 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
         </div>
       </header>
 
-      <div className="flex-grow w-full max-w-6xl mx-auto px-6 py-12">
+      <div className="maincont flex-grow w-full max-w-6xl mx-auto px-6 py-12">
         
         {/* Page Title */}
         <div className="text-center mb-10 flex flex-col items-center">
             
             {/* --- HEADER FIX: Side-by-Side Icon and Title --- */}
-            <div className="flex items-center gap-4 mb-4">
-                <div className="p-4 bg-gradient-to-br from-pink-500 to-purple-600 rounded-2xl shadow-lg shadow-pink-200 transform hover:scale-105 transition-transform duration-300">
+            <div className="flex items-center gap-4 mt-4 mb-4">
+                <div className="p-4 bg-gradient-to-br rounded from-pink-500 to-purple-600 rounded-2xl shadow-lg shadow-pink-200 transform hover:scale-105 transition-transform duration-300">
                     <Grid3x3 className="w-8 h-8 text-white" />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900">
@@ -452,8 +451,11 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold">Síguenos en Redes Sociales</h2>
                     <div className="flex gap-4">
-                        {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                            <a key={i} href="#" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
+                        {[
+                            { Icon: Twitter, href: "https://x.com/BreakMind35660" },
+                            { Icon: Instagram, href: "https://www.instagram.com/breakmindsw/" }
+                        ].map(({ Icon, href }, i) => (
+                            <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
                                 <Icon className="w-6 h-6" />
                             </a>
                         ))}
