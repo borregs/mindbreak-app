@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Upload, Download, Trash2, ImageIcon, Puzzle, Wand2, Zap, Facebook, Twitter, Instagram, Linkedin, ArrowUp } from 'lucide-react';
+import { FaTwitter, FaTiktok, FaFacebook, FaInstagram, FaXTwitter  } from 'react-icons/fa6';
 import { Button } from './components/ui/button';
 import { Card } from './components/ui/card';
 import { Progress } from './components/ui/progress';
@@ -204,7 +205,8 @@ export default function App() {
               onClick={() => setCurrentPage('home')} 
               className={`selected mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left `}
             >
-              Eliminar Fondo
+              <ImageIcon className='w-4 h-4 text-white'></ImageIcon>
+               Eliminar Fondo
             </button>
 
             {/* THE PUZZLE BUTTON */}
@@ -405,12 +407,15 @@ export default function App() {
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold">Síguenos en Redes Sociales</h2>
                     <div className="flex gap-4">
+                       
                         {[
-                            { Icon: Twitter, href: "https://x.com/BreakMind35660" },
-                            { Icon: Instagram, href: "https://www.instagram.com/breakmindsw/" }
+                            { Icon: FaXTwitter , href: "https://x.com/BreakMind35660" },
+                            { Icon: FaInstagram, href: "https://www.instagram.com/breakmindsw/" },
+                            { Icon: FaTiktok, href: "https://www.tiktok.com/@break_mind.tecmxli" },
+                            { Icon: FaFacebook, href: "https://www.facebook.com/profile.php?id=61584273899299" }
                         ].map(({ Icon, href }, i) => (
                             <a key={i} href={href} target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white hover:text-purple-600 transition-all">
-                                <Icon className="w-6 h-6" />
+                                <Icon className="w-8 h-8" />
                             </a>
                         ))}
                     </div>
