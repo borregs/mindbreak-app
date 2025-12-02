@@ -181,7 +181,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans text-slate-900">
       
      {/* --- NAVBAR FIXED --- */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm p-2">
+      <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           {/* Logo (Clickable to go Home) */}
@@ -193,7 +193,10 @@ export default function App() {
               colors={["#1E88E5", "#4f79ff", "#8E24AA", "#4079ff", "#F024ff"]}
               animationSpeed={8}
               showBorder={false}
-              className="font-bold text-2xl tracking-tighter custom-class mx-2"
+              // CHANGED: text-3xl (mobile) -> md:text-5xl (tablet) -> lg:text-6xl (desktop)
+              // CHANGED: px-2 (mobile) -> md:px-8 (desktop) to reduce crowded spacing
+              className="fluid-title "
+              //className="font-bold tracking-tighter custom-class mx-2"
             >
                BREAKMIND 
             </GradientText>
@@ -203,16 +206,15 @@ export default function App() {
           <nav className="navitems flex items-center gap-1 sm:gap-6">
             <button 
               onClick={() => setCurrentPage('home')} 
-              className={`selected mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left `}
-            >
-              <ImageIcon className='w-4 h-4 text-white'></ImageIcon>
-               Eliminar Fondo
+              className={`fluid-btn selected mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all  `}>
+              <ImageIcon className='w-4 h-4 text-white'/>
+              Eliminar Fondo
             </button>
 
             {/* THE PUZZLE BUTTON */}
             <button 
               onClick={() => setCurrentPage('puzzle')} 
-              className={`bechamel group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 `}
+              className={`bechamel fluid-btn group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2 `}
             >
               <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
               Rompecabezas
@@ -301,8 +303,8 @@ export default function App() {
                                 </p>
                             </div>
                             
-                            <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
-                                    Elegir Imagen    
+                            <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all thinbtn' type="button" onClick={() => fileInputRef.current?.click()}>
+                                Elegir Imagen
                             </Button>
                         </div>
                     </label>

@@ -1869,6 +1869,8 @@ html {
 .bechamel{
       transition: transform 0.3s ease-in-out; /* Smooth transition for transform changes */
       cursor:auto;
+      text-wrap: none;
+      white-space: nowrap;
 }.bechamel-g:hover{
       background-color: green;
       transform: scale(1.1); /* Grow to 110% of its original size */
@@ -1936,14 +1938,13 @@ html {
       background-color: #030213;
       color: #ffffff;
       transform: scale(1.1); /* Grow to 110% of its original size */
-
+      text-wrap: none;
+      white-space: nowrap;
 }.refimg{
   height: 400px;
   width: 400px;
 }.float-right{
   float: right;
-}.navitems{
-  margin-right: 60px;
 }.bg-checkerboard {
           background-image: 
             linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
@@ -1966,4 +1967,38 @@ html {
   display: inline-block;
 }.footing >*{
   margin-left: 5px;
+}.thinbtn{
+  min-width: 14ch;
+}.fluid-title {
+  /* clamp(MINIMUM, IDEAL, MAXIMUM)
+     - It will never be smaller than 32px (mobile)
+     - It will try to be 7% of the screen width (scaling)
+     - It will never be larger than 90px (huge screens)
+  */
+  font-size: clamp(18px, 5vw, 70px); 
+  
+  /* Standard styling */
+  line-height: 0.9;
+  font-weight: 800;
+  text-align: center;
+  width: 100%;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  background: transparent !important; /* In case it's a background gradient */
+}.fluid-btn {
+  /* Text size: Min 14px, Max 20px, scales with screen */
+  font-size: clamp(9px, 1vw, 15px); 
+
+  max-height: 6.5ch;  
+  /* Padding: Top/Bottom scales 10px-16px, Left/Right scales 15px-32px */
+  padding: clamp(1px, 1.5vw, 16px) clamp(4px, 3vw, 32px);
+  
+  /* Critical: Forces text to stay on one line */
+  white-space: nowrap; 
+  
+  /* Ensures buttons don't get impossibly wide */
+  width: auto;
+  min-width: fit-content;
 }

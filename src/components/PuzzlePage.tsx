@@ -222,7 +222,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                           colors={["#1E88E5", "#4f79ff", "#8E24AA", "#4079ff", "#F024ff"]}
                           animationSpeed={8}
                           showBorder={false}
-                          className="font-bold text-2xl tracking-tighter custom-class"
+                          className="fluid-title"
                         >
                BREAKMIND 
             </GradientText>
@@ -234,7 +234,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
             {/* Eliminar Fondo (Inactive State) */}
             <button 
               onClick={onNavigateHome} 
-              className="bechamel mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
+              className="fluid-btn bechamel mr-3 px-4 py-2 text-sm font-medium rounded-full transition-all float-left"
             >
               <ImageIcon className='w-4 h-4 '></ImageIcon>
 
@@ -243,7 +243,7 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
 
             {/* Rompecabezas (Active State - 'selected') */}
             <button 
-              className="selected group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2"
+              className="fluid-btn selected group ml-3 px-4 py-2 text-sm font-medium rounded-full transition-all flex items-center gap-2"
             >
               <Puzzle className={`w-4 h-4 transition-transform group-hover:rotate-12 `} />
               Rompecabezas
@@ -319,8 +319,8 @@ export function PuzzlePage({ onNavigateHome }: PuzzlePageProps) {
                       PNG, JPG, WEBP hasta 10MB
                     </p>
                   </div>
-                  <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
-                        Elegir Imagen    
+                  <Button className='bechamel thinbtn px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
+                    Elegir Imagen
                   </Button>
                 </div>
               </label>
