@@ -370,9 +370,9 @@ export default function App() {
                         </div>
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Listo</span>
                     </div>
-                    <div className="relative h-[400px] bg-checkerboard flex items-center justify-center p-4">
+                    <div className="relative h-[400px] flex items-center justify-center p-4">
                     {processedImage && (
-                        <img src={processedImage} alt="Procesada" className="max-w-full max-h-full object-contain drop-shadow-2xl" />
+                        <img src={processedImage} alt="Procesada" className="bg-checkerboard max-w-full max-h-full object-contain drop-shadow-2xl" />
                     )}
                     </div>
                 </Card>
