@@ -1,6 +1,7 @@
 {
       "name": "Background Remover App (Copy)",
       "version": "0.1.0",
+      "type":"module",
       "private": true,
       "dependencies": {
             "@imgly/background-removal": "*",
