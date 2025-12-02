@@ -5,6 +5,7 @@
 
   export default defineConfig({
     plugins: [react()],
+    base: 'https://borregs.github.io/mindbreak-app',
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
