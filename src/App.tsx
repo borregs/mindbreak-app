@@ -302,7 +302,7 @@ export default function App() {
                             </div>
                             
                             <Button className='bechamel px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all' type="button" onClick={() => fileInputRef.current?.click()}>
-                                   Elegir Imagen   
+                                    Elegir Imagen    
                             </Button>
                         </div>
                     </label>
