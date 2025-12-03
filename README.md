@@ -1,84 +1,86 @@
-# mindbreak-app
+# **Breakmind**
 
-### PROPUESTA DE PROYECTO: APLICACION WEB “MANIPULACION DE IMAGENES”
+**Breakmind** is a powerful, client-side web application that uses Artificial Intelligence to remove image backgrounds instantly. It operates entirely within the browser using TensorFlow.js, ensuring user privacy by never uploading images to an external server for processing.  
+Additionally, the application features an interactive "Puzzle Mode" and a fully responsive, modern UI designed for both mobile and desktop experiences.  
+**Live Demo:** [https://breakmind.lat](https://www.google.com/search?q=https://breakmind.lat)
 
-Objetivo general: 
-desarrollar una aplicacion web para facilitar la eliminacion de fondos de imagenes de manera sencilla mediante la integracion de IA.
+## **✨ Features**
 
-Objetivos especificos:
-1. Definir una arquitectura para la aplicacion web con el fin de facilitar el proceso de desarrollo
-2. Diseñar conjuntos de wireframes para la visualizacion de la interfaz grafica de la APP
-3. Programar el prototipo minimo viable para la evaluacion mediante pruebas establecidas.
+* **AI Background Removal:** Utilizes the @tensorflow-models/body-pix model to segment images and remove backgrounds in real-time.  
+* **Privacy First:** All image processing happens locally on the client's device. No data is sent to a backend.  
+* **Responsive Design:** Fluid typography and layout scaling using Tailwind CSS and custom clamp() utilities.  
+* **Drag & Drop:** Intuitive file upload interface.  
+* **Puzzle Mode:** Gamifies the experience by turning processed images into interactive puzzles.  
+* **Custom UI Components:** Built with reusable React components using Lucide and React Icons.
 
-# Requerimientos de proyecto
+## **🛠️ Tech Stack**
 
-Requerimientos del juego de rompecabezas (versión un jugador)
-Requerimientos Funcionales (RF)
+* **Framework:** [React](https://reactjs.org/) \+ [Vite](https://vitejs.dev/)  
+* **Language:** TypeScript  
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/)  
+* **AI/ML:** [TensorFlow.js](https://www.tensorflow.org/js) (@tensorflow/tfjs, @tensorflow-models/body-pix)  
+* **Icons:** [Lucide React](https://lucide.dev/) & [React Icons](https://react-icons.github.io/react-icons/)
 
-1. **Carga de imágenes**
-    - 1.1: El sistema permitirá que el usuario seleccione una imagen desde su dispositivo.
-    - 1.2: El sistema ofrecerá imágenes predeterminadas en caso de que el usuario no suba una propia.
-2. **Generación del rompecabezas**
-    - 2.1: El sistema dividirá la imagen en piezas de acuerdo con la dificultad seleccionada (ejemplo: 3x3, 5x5, 7x7).
-    - 2.2: El sistema desordenará automáticamente las piezas para iniciar el juego.
-3. **Interacción del jugador**
-    - 3.1: El usuario podrá arrastrar y soltar piezas para reacomodarlas en el tablero.
-    - 3.2: El sistema deberá permitir rotar piezas si la modalidad de dificultad lo requiere (opcional para futuro).
-    - 3.3: El sistema mostrará el progreso del rompecabezas (ejemplo: número de piezas bien colocadas).
-4. **Finalización del juego**
-    - 4.1: El sistema detectará cuando todas las piezas estén colocadas en la posición correcta.
-    - 4.2: Al completar el rompecabezas, el sistema mostrará un mensaje de felicitación y/o una animación de éxito.
-5. **Opciones adicionales**
-    - 5.1: El sistema permitirá reiniciar el rompecabezas en cualquier momento.
-    - 5.2: El sistema permitirá elegir la dificultad antes de iniciar la partida.
-    - 5.3: El sistema mostrará un temporizador opcional para medir el tiempo que tardó el usuario.
-6. **Sistema removedor de fondo**
-- 1: El sistema se encontrará en una sección separada del rompecabezas.
-- 2: Tendrá la capacidad de eliminar el fondo de una imagen proporcionada por el usuario.
+## **🚀 Getting Started**
 
-## Requerimientos No Funcionales (RNF)
+Follow these steps to set up the project locally on your machine.
 
-1. **Usabilidad**
-    - 1.1: La interfaz deberá ser intuitiva y fácil de usar, con instrucciones claras.
-    - 1.2: El sistema deberá ser responsivo, es decir, funcionar correctamente en PC, Tablet y móvil.
-2. **Rendimiento**
-    - 2.1: El sistema deberá generar el rompecabezas en menos de 3 segundos después de subir la imagen.
-    - 2.2: El tiempo de respuesta al mover una pieza no deberá superar los 200 ms.
-3. **Compatibilidad**
-    - 3.1: El sistema deberá ser compatible con los navegadores principales (Chrome, Firefox, Edge).
-    - 3.2: El juego deberá funcionar sin necesidad de instalar aplicaciones adicionales (solo navegador).
-4. **Seguridad**
-    - 4.1: Las imágenes cargadas por el usuario no deberán almacenarse en un servidor (solo uso temporal en el navegador).
-    - 4.2: El sistema deberá evitar la ejecución de archivos maliciosos al cargar imágenes.
-5. **Estabilidad**
-    - 5.1: El sistema no deberá presentar errores críticos que detengan el juego durante la sesión.
-    - 5.2: En caso de error, el sistema deberá permitir reiniciar la partida sin perder acceso al juego.
-  
-## a) Hardware requerido para funcionamiento
-Servidor
-•	Procesador: 2 núcleos a 2.0 GHz o superior
-•	Memoria RAM: 4 GB mínimo
-•	Almacenamiento: 20 GB disponible
-•	Conexión a Internet estable
-Equipos del Usuario
-•	Computadora con procesador Intel Core i3 o equivalente
-•	Memoria RAM: 4 GB mínimo
-•	Conexión a Internet: 5 Mbps mínimo
-•	Resolución de pantalla: 1366x768 mínimo
+### **Prerequisites**
 
-## b) Software y navegadores compatibles
-Navegadores Web (Únicos Garantizados)
-El sistema funcionará correctamente en:
-•	Google Chrome versión 90 o superior
-•	Mozilla Firefox versión 88 o superior
-•	Microsoft Edge versión 90 o superior
-•	Safari versión 14 o superior
+* **Node.js:** Version 18.0.0 or higher is recommended.  
+* **npm:** Typically installed with Node.js.
 
-Para correr el programa
+### **Installation**
 
-Después de instalar nodejs
+1. **Clone the repository:**  
+   git clone \[https://github.com/borregs/mindbreak-app.git\](https://github.com/borregs/mindbreak-app.git)  
+   cd mindbreak-app
 
-```
-npm install (instalar librerías)
-npm run dev
-```
+2. **Install dependencies:**  
+   npm install
+
+3. **Run the development server:**  
+   npm run dev
+
+   Open http://localhost:5173 to view it in the browser.
+
+## **📜 Scripts**
+
+| Script | Description |
+| :---- | :---- |
+| npm run dev | Starts the local development server with HMR. |
+| npm run build | Compiles the TypeScript and builds the app for production in /dist. |
+| npm run preview | Locally previews the production build. |
+| npm run deploy | Builds the project and deploys it to GitHub Pages (gh-pages branch). |
+
+## **🌐 Deployment & Custom Domain**
+
+This project is deployed via GitHub Pages.  
+Important Note for Custom Domains:  
+The public/CNAME file ensures that the custom domain (breakmind.lat) persists after every deployment. If this file is missing, GitHub Pages may reset the custom domain settings.  
+To deploy a new version:  
+npm run deploy
+
+## **📂 Project Structure**
+
+mindbreak-app/  
+├── public/  
+│   ├── CNAME              \# Custom domain configuration  
+│   └── vite.svg           \# Favicon/Icons  
+├── src/  
+│   ├── components/        \# Reusable UI components (Buttons, Cards, etc.)  
+│   │   └── ui/  
+│   ├── App.tsx            \# Main application logic & Routing  
+│   ├── index.css          \# Global styles & Tailwind directives  
+│   └── main.tsx           \# Entry point  
+├── package.json           \# Dependencies and scripts  
+├── vite.config.ts         \# Vite configuration (Base path settings)  
+└── tsconfig.json          \# TypeScript configuration
+
+## **🤝 Contributing**
+
+Contributions are welcome\! Please feel free to submit a Pull Request.
+
+## **📄 License**
+
+This project is open source and available under the [MIT License](https://www.google.com/search?q=LICENSE).
